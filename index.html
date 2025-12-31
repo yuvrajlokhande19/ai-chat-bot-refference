@@ -339,7 +339,7 @@
             <div class="chat-container">
                 <div class="chat-header">
                     <h2><i class="fas fa-robot"></i> AI Legal Assistant</h2>
-                    <p>Ask any questions - I'll provide helpful legal information</p>
+                    <p>Ask any legal questions - I'll provide helpful legal information</p>
                 </div>
                 
                 <div class="chat-messages" id="chat-messages">
@@ -368,7 +368,7 @@
 
                 <div class="chat-input-container">
                     <div class="input-group">
-                        <input type="text" id="user-input" placeholder="Type your question here... (e.g., 'What are my rights as a tenant?')" autocomplete="off">
+                        <input type="text" id="user-input" placeholder="Type your legal question here..." autocomplete="off">
                         <button id="send-btn">
                             <i class="fas fa-paper-plane"></i> Send
                         </button>
@@ -378,7 +378,7 @@
 
             <div class="lawyer-contact">
                 <div class="contact-header">
-                    <i class="fas fa-user-tie"></i> Contact Our Lawyers
+                    <i class="fas fa-user-tie"></i> Contact Our Trusted Lawyers
                 </div>
                 
                 <div class="lawyer-card">
@@ -427,8 +427,8 @@
     </div>
 
     <script>
-        const API_KEY = 'AIzaSyD7KDRN8Gam9L4n5DrKCQh5omIicykB34o';
-        const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`;
+        const DEEPSEEK_API_KEY = 'sk-e542a3bb6787476b9704ee0a84b21d48';
+        const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
 
         const chatMessages = document.getElementById('chat-messages');
         const userInput = document.getElementById('user-input');
@@ -436,27 +436,78 @@
         const typingIndicator = document.getElementById('typing-indicator');
         const exampleQuestions = document.getElementById('example-questions');
 
-        // Fallback responses in case API fails
-        const fallbackResponses = {
-            legal: "Based on Indian law, I can provide you with general information. However, for specific legal advice, you should consult with a qualified lawyer who can review the details of your situation.",
-            nonLegal: "I specialize in Indian legal matters. If you have questions about laws, legal procedures, rights, or any legal topic, I'd be happy to help. For non-legal matters, you might want to consult other appropriate resources.",
-            error: "I'm experiencing some technical difficulties. Let me provide you with general legal information while I work on resolving this issue."
-        };
+        // Strict legal system prompt
+        const SYSTEM_PROMPT = `You are a legal assistant for Indian Law Associates. Your ONLY purpose is to provide information about Indian laws, legal procedures, and legal concepts.
 
-        // Sample legal responses for common questions
-        const sampleLegalResponses = {
-            "indian penal code": "The Indian Penal Code (IPC) is the main criminal code of India. It covers all substantive aspects of criminal law. Key sections include: Section 299-304 (Murder and Culpable Homicide), Section 375 (Rape), Section 420 (Cheating), Section 497 (Adultery - now decriminalized). The IPC was drafted in 1860 and came into force in 1862.",
-            "consumer complaint": "To file a consumer complaint in India:\n1. Document all evidence (bills, receipts, communications)\n2. Send a legal notice to the service provider\n3. File complaint with District Consumer Forum (up to ₹20 lakhs)\n4. For higher amounts, approach State Commission or National Commission\nTime limit: Within 2 years of cause of action",
-            "property registration": "Property registration process in India:\n1. Verify property documents and title\n2. Prepare sale agreement on stamp paper\n3. Pay stamp duty (varies by state)\n4. Register at Sub-Registrar Office within 4 months\n5. Both parties must be present with witnesses\n6. Required documents: ID proof, property papers, PAN, passport photos",
-            "divorce laws": "Divorce laws in India vary by religion:\n• Hindus: Hindu Marriage Act, 1955 - grounds include adultery, cruelty, desertion, conversion, mental disorder\n• Muslims: Muslim Personal Law - Talaq (by husband), Khula (by wife), Mubarat (mutual)\n• Christians: Indian Divorce Act, 1869\n• Special Marriage Act applies to inter-religion marriages\nMinimum separation period: 1 year for mutual consent"
+STRICT RULES:
+1. ONLY answer questions related to Indian law, legal procedures, rights, court processes, or legal documentation
+2. If asked about non-legal topics, politely respond: "I specialize only in Indian legal matters. Please ask about laws, legal procedures, or legal rights."
+3. Always provide accurate, clear legal information based on Indian legal system
+4. Include disclaimers that this is not legal advice
+5. END EVERY RESPONSE with: "For personalized legal advice and consultation, please contact our trusted lawyers at Indian Law Associates."
+
+TOPICS YOU CAN DISCUSS:
+- Indian Penal Code (IPC), CrPC, CPC
+- Constitutional rights and laws
+- Property laws, Family laws, Business laws
+- Consumer protection, Labor laws, Tax laws
+- Legal procedures, Court processes, Documentation
+- Rights of citizens, Legal remedies
+
+FORMAT:
+- Provide structured information with clear points
+- Mention relevant laws and sections when possible
+- Keep responses professional and helpful
+- Always include disclaimer and contact recommendation`;
+
+        // Fallback legal responses
+        const FALLBACK_RESPONSES = {
+            legal: `I can provide you with general legal information. However, remember that this is not legal advice. For specific legal matters, you should consult with a qualified lawyer.
+
+For personalized legal advice and consultation, please contact our trusted lawyers at Indian Law Associates.`,
+            
+            nonLegal: `I specialize only in Indian legal matters. I can help you with questions about:
+• Laws and legal procedures
+• Rights and legal protections
+• Court processes and documentation
+• Legal requirements and compliance
+
+Please ask about any of these legal topics.
+
+For personalized legal advice and consultation, please contact our trusted lawyers at Indian Law Associates.`
         };
 
         // Check if question is legal related
         function isLegalQuestion(question) {
-            const legalKeywords = ['law', 'legal', 'court', 'judge', 'lawyer', 'advocate', 'case', 'police', 'crime', 
-                                  'rights', 'act', 'section', 'code', 'contract', 'agreement', 'property', 'divorce',
-                                  'marriage', 'tenant', 'landlord', 'consumer', 'complaint', 'ipc', 'cpc', 'crpc',
-                                  'constitution', 'bail', 'arrest', 'evidence', 'witness', 'trial', 'judgment'];
+            const legalKeywords = [
+                // Laws and Codes
+                'law', 'legal', 'act', 'section', 'code', 'ipc', 'cpc', 'crpc', 'constitution',
+                'statute', 'regulation', 'ordinance', 'bill', 'amendment',
+                
+                // Legal Fields
+                'criminal', 'civil', 'property', 'family', 'divorce', 'marriage', 'inheritance',
+                'contract', 'business', 'corporate', 'tax', 'labor', 'employment', 'consumer',
+                'cyber', 'intellectual', 'patent', 'copyright', 'trademark',
+                
+                // Legal Processes
+                'court', 'judge', 'lawyer', 'advocate', 'case', 'trial', 'hearing', 'judgment',
+                'appeal', 'bail', 'arrest', 'police', 'fir', 'complaint', 'notice', 'suit',
+                'petition', 'affidavit', 'evidence', 'witness', 'testimony',
+                
+                // Rights and Remedies
+                'rights', 'duties', 'obligations', 'liability', 'responsibility',
+                'remedy', 'compensation', 'damages', 'injunction', 'specific performance',
+                
+                // Legal Documentation
+                'agreement', 'contract', 'deed', 'will', 'power of attorney', 'affidavit',
+                'notice', 'summons', 'warrant', 'order', 'decree',
+                
+                // Common Legal Terms
+                'tenant', 'landlord', 'owner', 'possession', 'ownership', 'lease', 'rent',
+                'employee', 'employer', 'salary', 'termination', 'discrimination',
+                'consumer', 'manufacturer', 'seller', 'defect', 'deficiency',
+                'accident', 'injury', 'negligence', 'tort', 'defamation'
+            ];
             
             question = question.toLowerCase();
             return legalKeywords.some(keyword => question.includes(keyword));
@@ -491,82 +542,62 @@
             typingIndicator.style.display = 'none';
         }
 
-        function generateResponse(userMessage) {
-            userMessage = userMessage.toLowerCase().trim();
-            
-            // Check if it's a legal question
-            if (!isLegalQuestion(userMessage)) {
-                return `${fallbackResponses.nonLegal}<br><br><div class="contact-note">If you need legal assistance, please contact our lawyers for proper consultation.</div>`;
-            }
-
-            // Check for sample responses
-            for (const [key, response] of Object.entries(sampleLegalResponses)) {
-                if (userMessage.includes(key)) {
-                    return `${response}<br><br><div class="contact-note"><i class="fas fa-handshake"></i> For personalized legal advice and detailed consultation about your specific situation, please contact our lawyers at Indian Law Associates.</div>`;
-                }
-            }
-
-            // Try to call Gemini API
-            return fetchGeminiResponse(userMessage);
-        }
-
-        async function fetchGeminiResponse(userMessage) {
+        async function sendMessageToDeepSeek(userMessage) {
             showTypingIndicator();
             sendBtn.disabled = true;
             
             try {
-                const response = await fetch(GEMINI_API_URL, {
+                const response = await fetch(DEEPSEEK_API_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
                     },
                     body: JSON.stringify({
-                        contents: [{
-                            parts: [{
-                                text: `You are a legal assistant for Indian Law Associates. Provide helpful information about Indian laws. Always end with: "For personalized legal advice and detailed consultation about your specific situation, please contact our lawyers at Indian Law Associates."
-
-User Question: ${userMessage}
-
-Provide a helpful response about Indian law:`
-                            }]
-                        }],
-                        generationConfig: {
-                            temperature: 0.7,
-                            topK: 40,
-                            topP: 0.95,
-                            maxOutputTokens: 1024,
-                        },
-                        safetySettings: [
+                        model: "deepseek-chat",
+                        messages: [
                             {
-                                category: "HARM_CATEGORY_HARASSMENT",
-                                threshold: "BLOCK_MEDIUM_AND_ABOVE"
+                                role: "system",
+                                content: SYSTEM_PROMPT
+                            },
+                            {
+                                role: "user",
+                                content: userMessage
                             }
-                        ]
+                        ],
+                        temperature: 0.7,
+                        max_tokens: 1000,
+                        stream: false
                     })
                 });
 
                 if (!response.ok) {
-                    throw new Error(`API request failed with status ${response.status}`);
+                    throw new Error(`DeepSeek API error: ${response.status}`);
                 }
 
                 const data = await response.json();
                 
-                if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-                    let botResponse = data.candidates[0].content.parts[0].text;
+                if (data.choices && data.choices[0] && data.choices[0].message) {
+                    let botResponse = data.choices[0].message.content;
                     
                     // Ensure contact information is included
-                    if (!botResponse.includes("contact our lawyers")) {
-                        botResponse += `<br><br><div class="contact-note"><i class="fas fa-handshake"></i> For personalized legal advice and detailed consultation about your specific situation, please contact our lawyers at Indian Law Associates.</div>`;
+                    if (!botResponse.includes("contact our trusted lawyers")) {
+                        botResponse += `<br><br><div class="contact-note"><i class="fas fa-handshake"></i> For personalized legal advice and consultation, please contact our trusted lawyers at Indian Law Associates.</div>`;
                     }
                     
                     return botResponse;
                 } else {
-                    throw new Error('Invalid response format');
+                    throw new Error('Invalid response format from DeepSeek');
                 }
             } catch (error) {
-                console.error('Gemini API Error:', error);
-                // Return fallback response
-                return `${fallbackResponses.legal}<br><br><div class="contact-note"><i class="fas fa-exclamation-circle"></i> Note: I'm currently experiencing technical difficulties with my AI system. For accurate legal advice, please contact our lawyers directly.</div>`;
+                console.error('DeepSeek API Error:', error);
+                
+                // Check if it's a legal question for fallback
+                if (isLegalQuestion(userMessage)) {
+                    return `${FALLBACK_RESPONSES.legal}<br><br><div class="contact-note"><i class="fas fa-exclamation-circle"></i> For detailed legal consultation, please contact our trusted lawyers directly.</div>`;
+                } else {
+                    return `${FALLBACK_RESPONSES.nonLegal}<br><br><div class="contact-note"><i class="fas fa-exclamation-circle"></i> Our trusted lawyers can provide proper legal consultation for your needs.</div>`;
+                }
             } finally {
                 hideTypingIndicator();
                 sendBtn.disabled = false;
@@ -581,8 +612,15 @@ Provide a helpful response about Indian law:`
             addMessage('user', userMessage);
             userInput.value = '';
             
-            // Generate response
-            const response = await generateResponse(userMessage);
+            // Check if it's a legal question first
+            if (!isLegalQuestion(userMessage)) {
+                const response = `${FALLBACK_RESPONSES.nonLegal}<br><br><div class="contact-note"><i class="fas fa-handshake"></i> Our trusted lawyers are available for proper legal consultation.</div>`;
+                addMessage('bot', response);
+                return;
+            }
+            
+            // Get response from DeepSeek
+            const response = await sendMessageToDeepSeek(userMessage);
             addMessage('bot', response);
         }
 
@@ -603,31 +641,25 @@ Provide a helpful response about Indian law:`
             });
         });
 
-        // Add more example questions on click
+        // Add more example questions
         const moreExamples = [
             "What is bail procedure in India?",
             "How to draft a legal notice?",
             "Rights of women under Indian law",
             "Cyber crime laws in India",
-            "Labor laws for employees"
+            "Labor laws for employees",
+            "How to file a police complaint?",
+            "Property transfer process",
+            "Tenant rights in India"
         ];
 
         // Add a button to show more examples
         const moreExamplesBtn = document.createElement('button');
-        moreExamplesBtn.innerHTML = '<i class="fas fa-plus"></i> More Examples';
-        moreExamplesBtn.style.cssText = `
-            background: transparent;
-            border: 2px dashed #1a237e;
-            color: #1a237e;
-            padding: 8px 15px;
-            border-radius: 20px;
-            margin-top: 10px;
-            cursor: pointer;
-            font-size: 0.85em;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        `;
+        moreExamplesBtn.innerHTML = '<i class="fas fa-plus"></i> More Legal Questions';
+        moreExamplesBtn.className = 'example-btn';
+        moreExamplesBtn.style.marginTop = '10px';
+        moreExamplesBtn.style.width = '100%';
+        moreExamplesBtn.style.justifyContent = 'center';
         
         moreExamplesBtn.addEventListener('click', () => {
             moreExamples.forEach(question => {
@@ -643,7 +675,10 @@ Provide a helpful response about Indian law:`
             moreExamplesBtn.style.display = 'none';
         });
 
-        exampleQuestions.parentNode.insertBefore(moreExamplesBtn, exampleQuestions.nextSibling);
+        exampleQuestions.appendChild(moreExamplesBtn);
+
+        // Auto-focus on input
+        userInput.focus();
     </script>
 </body>
 </html>
