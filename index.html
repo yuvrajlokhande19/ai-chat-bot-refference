@@ -81,12 +81,14 @@
             border-radius: 10px;
             max-width: 80%;
             animation: fadeIn 0.3s ease;
+            line-height: 1.6;
         }
 
         .user-message {
             background: #e3f2fd;
             margin-left: auto;
             border-bottom-right-radius: 5px;
+            border-left: 4px solid #1a237e;
         }
 
         .bot-message {
@@ -94,12 +96,16 @@
             border: 1px solid #e0e0e0;
             margin-right: auto;
             border-bottom-left-radius: 5px;
+            border-right: 4px solid #283593;
         }
 
         .message-header {
             font-weight: bold;
             margin-bottom: 5px;
             color: #1a237e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .disclaimer {
@@ -107,9 +113,20 @@
             border: 1px solid #ffeaa7;
             border-radius: 8px;
             padding: 15px;
-            margin-top: 10px;
+            margin-top: 15px;
             font-size: 0.9em;
             color: #856404;
+        }
+
+        .contact-note {
+            background: #e8f5e9;
+            border: 1px solid #c8e6c9;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #2e7d32;
+            font-weight: 600;
         }
 
         .chat-input-container {
@@ -145,11 +162,23 @@
             border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
-            transition: transform 0.2s;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         #send-btn:hover {
+            background: linear-gradient(135deg, #283593 0%, #1a237e 100%);
             transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(26, 35, 126, 0.3);
+        }
+
+        #send-btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
         .lawyer-contact {
@@ -165,6 +194,10 @@
             margin-bottom: 20px;
             text-align: center;
             font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
         .lawyer-card {
@@ -172,18 +205,29 @@
             padding: 25px;
             border-radius: 10px;
             margin-bottom: 20px;
+            border-left: 5px solid #1a237e;
+            transition: transform 0.3s;
+        }
+
+        .lawyer-card:hover {
+            transform: translateY(-5px);
         }
 
         .lawyer-name {
             color: #1a237e;
             font-size: 1.3em;
             margin-bottom: 10px;
+            font-weight: 600;
         }
 
         .lawyer-specialization {
             color: #666;
             margin-bottom: 15px;
             font-size: 0.9em;
+            background: #e3f2fd;
+            padding: 5px 10px;
+            border-radius: 4px;
+            display: inline-block;
         }
 
         .contact-info {
@@ -208,11 +252,17 @@
             color: white;
             padding: 20px;
             font-size: 0.9em;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
         }
 
         .typing-indicator {
             display: none;
             padding: 15px;
+            background: white;
+            border-radius: 10px;
+            margin: 10px 0;
+            width: fit-content;
         }
 
         .typing-dot {
@@ -227,6 +277,30 @@
 
         .typing-dot:nth-child(2) { animation-delay: 0.2s; }
         .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        .examples {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .example-btn {
+            background: #f0f4ff;
+            border: 1px solid #d1d9ff;
+            color: #1a237e;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .example-btn:hover {
+            background: #e3f2fd;
+            border-color: #1a237e;
+            transform: translateY(-2px);
+        }
 
         @keyframes typing {
             0%, 60%, 100% { transform: translateY(0); }
@@ -246,6 +320,10 @@
             .chat-messages {
                 max-height: 400px;
             }
+            
+            .message {
+                max-width: 90%;
+            }
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -253,23 +331,31 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo">Indian Law Associates</div>
-            <div class="tagline">Your Trusted Legal Partner Since 1995</div>
+            <div class="logo"><i class="fas fa-balance-scale"></i> Indian Law Associates</div>
+            <div class="tagline">Your Trusted Legal Partner | Est. 1995</div>
         </div>
 
         <div class="main-content">
             <div class="chat-container">
                 <div class="chat-header">
-                    <h2><i class="fas fa-gavel"></i> Legal Assistant</h2>
-                    <p>Ask any legal questions related to Indian law</p>
+                    <h2><i class="fas fa-robot"></i> AI Legal Assistant</h2>
+                    <p>Ask any questions - I'll provide helpful legal information</p>
                 </div>
                 
                 <div class="chat-messages" id="chat-messages">
                     <div class="message bot-message">
-                        <div class="message-header">Legal Assistant</div>
-                        <div>Welcome to Indian Law Associates Legal Assistant. I'm here to provide information about Indian laws and legal procedures.</div>
+                        <div class="message-header">
+                            <i class="fas fa-robot"></i> Legal Assistant
+                        </div>
+                        <div>Hello! I'm your AI Legal Assistant from Indian Law Associates. I can help you with information about Indian laws, legal procedures, rights, and various legal matters.</div>
                         <div class="disclaimer">
-                            <strong>Disclaimer:</strong> This AI provides general legal information only. It does not constitute legal advice. For personalized legal counsel, please contact our lawyers directly.
+                            <strong><i class="fas fa-exclamation-triangle"></i> Disclaimer:</strong> This AI provides general legal information for educational purposes only. It does not constitute legal advice or create an attorney-client relationship. Always consult with a qualified lawyer for your specific legal situation.
+                        </div>
+                        <div class="examples" id="example-questions">
+                            <div class="example-btn">What is the Indian Penal Code?</div>
+                            <div class="example-btn">How to file a consumer complaint?</div>
+                            <div class="example-btn">Property registration process</div>
+                            <div class="example-btn">Divorce laws in India</div>
                         </div>
                     </div>
                 </div>
@@ -282,8 +368,10 @@
 
                 <div class="chat-input-container">
                     <div class="input-group">
-                        <input type="text" id="user-input" placeholder="Ask your legal question here..." autocomplete="off">
-                        <button id="send-btn">Send <i class="fas fa-paper-plane"></i></button>
+                        <input type="text" id="user-input" placeholder="Type your question here... (e.g., 'What are my rights as a tenant?')" autocomplete="off">
+                        <button id="send-btn">
+                            <i class="fas fa-paper-plane"></i> Send
+                        </button>
                     </div>
                 </div>
             </div>
@@ -294,40 +382,47 @@
                 </div>
                 
                 <div class="lawyer-card">
-                    <div class="lawyer-name">Adv. Rajesh Kumar</div>
+                    <div class="lawyer-name"><i class="fas fa-crown"></i> Adv. Rajesh Kumar</div>
                     <div class="lawyer-specialization">Supreme Court Advocate | Criminal Law Specialist</div>
                     <ul class="contact-info">
                         <li><i class="fas fa-phone"></i> +91 98765 43210</li>
                         <li><i class="fas fa-envelope"></i> rajesh.kumar@indianlawassociates.in</li>
                         <li><i class="fas fa-clock"></i> Mon-Fri: 9 AM - 6 PM</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Chamber No. 15, Supreme Court</li>
                     </ul>
                 </div>
 
                 <div class="lawyer-card">
-                    <div class="lawyer-name">Adv. Priya Sharma</div>
+                    <div class="lawyer-name"><i class="fas fa-female"></i> Adv. Priya Sharma</div>
                     <div class="lawyer-specialization">High Court Advocate | Civil & Family Law</div>
                     <ul class="contact-info">
                         <li><i class="fas fa-phone"></i> +91 98765 43211</li>
                         <li><i class="fas fa-envelope"></i> priya.sharma@indianlawassociates.in</li>
                         <li><i class="fas fa-clock"></i> Mon-Sat: 10 AM - 7 PM</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Delhi High Court Premises</li>
                     </ul>
                 </div>
 
                 <div class="lawyer-card">
-                    <div class="lawyer-name">Adv. Amit Patel</div>
+                    <div class="lawyer-name"><i class="fas fa-briefcase"></i> Adv. Amit Patel</div>
                     <div class="lawyer-specialization">Corporate & Intellectual Property Law</div>
                     <ul class="contact-info">
                         <li><i class="fas fa-phone"></i> +91 98765 43212</li>
                         <li><i class="fas fa-envelope"></i> amit.patel@indianlawassociates.in</li>
                         <li><i class="fas fa-clock"></i> By Appointment</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Connaught Place, New Delhi</li>
                     </ul>
+                </div>
+
+                <div class="contact-note">
+                    <i class="fas fa-handshake"></i> First 30-minute consultation free for new clients
                 </div>
             </div>
         </div>
 
         <div class="footer">
-            <p>© 2024 Indian Law Associates. All rights reserved.</p>
-            <p>For emergency legal assistance, call our helpline: 1800-XXX-XXXX</p>
+            <p><i class="fas fa-shield-alt"></i> © 2024 Indian Law Associates. All rights reserved.</p>
+            <p><i class="fas fa-phone-volume"></i> 24/7 Emergency Helpline: 1800-112-2333</p>
         </div>
     </div>
 
@@ -339,30 +434,33 @@
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-btn');
         const typingIndicator = document.getElementById('typing-indicator');
+        const exampleQuestions = document.getElementById('example-questions');
 
-        // System prompt to instruct the AI
-        const systemPrompt = `You are a legal assistant for Indian Law Associates. Your role is to provide information about Indian laws and legal procedures. 
+        // Fallback responses in case API fails
+        const fallbackResponses = {
+            legal: "Based on Indian law, I can provide you with general information. However, for specific legal advice, you should consult with a qualified lawyer who can review the details of your situation.",
+            nonLegal: "I specialize in Indian legal matters. If you have questions about laws, legal procedures, rights, or any legal topic, I'd be happy to help. For non-legal matters, you might want to consult other appropriate resources.",
+            error: "I'm experiencing some technical difficulties. Let me provide you with general legal information while I work on resolving this issue."
+        };
 
-        IMPORTANT INSTRUCTIONS:
-        1. ONLY answer questions related to Indian law, legal procedures, rights, and legal concepts
-        2. If asked about non-legal topics, politely decline and redirect to legal matters
-        3. Provide accurate, clear information based on Indian legal system
-        4. Always include a disclaimer that this is not legal advice
-        5. At the end of EVERY response, add: "For personalized legal advice and consultation, please contact our lawyers at Indian Law Associates."
-        
-        Examples of appropriate topics:
-        - Indian Penal Code (IPC)
-        - Civil Procedure Code (CPC)
-        - Criminal Procedure Code (CrPC)
-        - Constitution of India
-        - Property laws
-        - Family laws (Hindu Marriage Act, etc.)
-        - Labor laws
-        - Tax laws
-        - Consumer protection laws
-        - Legal procedures and documentation
+        // Sample legal responses for common questions
+        const sampleLegalResponses = {
+            "indian penal code": "The Indian Penal Code (IPC) is the main criminal code of India. It covers all substantive aspects of criminal law. Key sections include: Section 299-304 (Murder and Culpable Homicide), Section 375 (Rape), Section 420 (Cheating), Section 497 (Adultery - now decriminalized). The IPC was drafted in 1860 and came into force in 1862.",
+            "consumer complaint": "To file a consumer complaint in India:\n1. Document all evidence (bills, receipts, communications)\n2. Send a legal notice to the service provider\n3. File complaint with District Consumer Forum (up to ₹20 lakhs)\n4. For higher amounts, approach State Commission or National Commission\nTime limit: Within 2 years of cause of action",
+            "property registration": "Property registration process in India:\n1. Verify property documents and title\n2. Prepare sale agreement on stamp paper\n3. Pay stamp duty (varies by state)\n4. Register at Sub-Registrar Office within 4 months\n5. Both parties must be present with witnesses\n6. Required documents: ID proof, property papers, PAN, passport photos",
+            "divorce laws": "Divorce laws in India vary by religion:\n• Hindus: Hindu Marriage Act, 1955 - grounds include adultery, cruelty, desertion, conversion, mental disorder\n• Muslims: Muslim Personal Law - Talaq (by husband), Khula (by wife), Mubarat (mutual)\n• Christians: Indian Divorce Act, 1869\n• Special Marriage Act applies to inter-religion marriages\nMinimum separation period: 1 year for mutual consent"
+        };
 
-        Structure your responses professionally with clear headings and bullet points where appropriate.`;
+        // Check if question is legal related
+        function isLegalQuestion(question) {
+            const legalKeywords = ['law', 'legal', 'court', 'judge', 'lawyer', 'advocate', 'case', 'police', 'crime', 
+                                  'rights', 'act', 'section', 'code', 'contract', 'agreement', 'property', 'divorce',
+                                  'marriage', 'tenant', 'landlord', 'consumer', 'complaint', 'ipc', 'cpc', 'crpc',
+                                  'constitution', 'bail', 'arrest', 'evidence', 'witness', 'trial', 'judgment'];
+            
+            question = question.toLowerCase();
+            return legalKeywords.some(keyword => question.includes(keyword));
+        }
 
         function addMessage(sender, message) {
             const messageDiv = document.createElement('div');
@@ -370,7 +468,9 @@
             
             const header = document.createElement('div');
             header.className = 'message-header';
-            header.textContent = sender === 'user' ? 'You' : 'Legal Assistant';
+            header.innerHTML = sender === 'user' 
+                ? '<i class="fas fa-user"></i> You' 
+                : '<i class="fas fa-robot"></i> Legal Assistant';
             
             const content = document.createElement('div');
             content.innerHTML = message;
@@ -391,17 +491,29 @@
             typingIndicator.style.display = 'none';
         }
 
-        async function sendMessage() {
-            const userMessage = userInput.value.trim();
-            if (!userMessage) return;
-
-            // Add user message to chat
-            addMessage('user', userMessage);
-            userInput.value = '';
+        function generateResponse(userMessage) {
+            userMessage = userMessage.toLowerCase().trim();
             
-            // Show typing indicator
-            showTypingIndicator();
+            // Check if it's a legal question
+            if (!isLegalQuestion(userMessage)) {
+                return `${fallbackResponses.nonLegal}<br><br><div class="contact-note">If you need legal assistance, please contact our lawyers for proper consultation.</div>`;
+            }
 
+            // Check for sample responses
+            for (const [key, response] of Object.entries(sampleLegalResponses)) {
+                if (userMessage.includes(key)) {
+                    return `${response}<br><br><div class="contact-note"><i class="fas fa-handshake"></i> For personalized legal advice and detailed consultation about your specific situation, please contact our lawyers at Indian Law Associates.</div>`;
+                }
+            }
+
+            // Try to call Gemini API
+            return fetchGeminiResponse(userMessage);
+        }
+
+        async function fetchGeminiResponse(userMessage) {
+            showTypingIndicator();
+            sendBtn.disabled = true;
+            
             try {
                 const response = await fetch(GEMINI_API_URL, {
                     method: 'POST',
@@ -411,15 +523,25 @@
                     body: JSON.stringify({
                         contents: [{
                             parts: [{
-                                text: `${systemPrompt}\n\nUser Question: ${userMessage}\n\nAssistant Response:`
+                                text: `You are a legal assistant for Indian Law Associates. Provide helpful information about Indian laws. Always end with: "For personalized legal advice and detailed consultation about your specific situation, please contact our lawyers at Indian Law Associates."
+
+User Question: ${userMessage}
+
+Provide a helpful response about Indian law:`
                             }]
                         }],
                         generationConfig: {
                             temperature: 0.7,
-                            topK: 1,
+                            topK: 40,
                             topP: 0.95,
                             maxOutputTokens: 1024,
-                        }
+                        },
+                        safetySettings: [
+                            {
+                                category: "HARM_CATEGORY_HARASSMENT",
+                                threshold: "BLOCK_MEDIUM_AND_ABOVE"
+                            }
+                        ]
                     })
                 });
 
@@ -430,65 +552,98 @@
                 const data = await response.json();
                 
                 if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-                    const botResponse = data.candidates[0].content.parts[0].text;
-                    addMessage('bot', botResponse);
+                    let botResponse = data.candidates[0].content.parts[0].text;
+                    
+                    // Ensure contact information is included
+                    if (!botResponse.includes("contact our lawyers")) {
+                        botResponse += `<br><br><div class="contact-note"><i class="fas fa-handshake"></i> For personalized legal advice and detailed consultation about your specific situation, please contact our lawyers at Indian Law Associates.</div>`;
+                    }
+                    
+                    return botResponse;
                 } else {
-                    throw new Error('Invalid response format from API');
+                    throw new Error('Invalid response format');
                 }
             } catch (error) {
-                console.error('Error:', error);
-                addMessage('bot', `I apologize, but I encountered an error. Please try again. For immediate assistance, please contact our lawyers directly.<br><br>Error details: ${error.message}`);
+                console.error('Gemini API Error:', error);
+                // Return fallback response
+                return `${fallbackResponses.legal}<br><br><div class="contact-note"><i class="fas fa-exclamation-circle"></i> Note: I'm currently experiencing technical difficulties with my AI system. For accurate legal advice, please contact our lawyers directly.</div>`;
             } finally {
                 hideTypingIndicator();
+                sendBtn.disabled = false;
             }
+        }
+
+        async function sendMessage() {
+            const userMessage = userInput.value.trim();
+            if (!userMessage) return;
+
+            // Add user message to chat
+            addMessage('user', userMessage);
+            userInput.value = '';
+            
+            // Generate response
+            const response = await generateResponse(userMessage);
+            addMessage('bot', response);
         }
 
         // Event listeners
         sendBtn.addEventListener('click', sendMessage);
         
         userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
+            if (e.key === 'Enter' && !sendBtn.disabled) {
                 sendMessage();
             }
         });
 
-        // Example questions
-        const exampleQuestions = [
-            "What are the key provisions of the Indian Penal Code?",
-            "How to file a consumer complaint in India?",
-            "What is the procedure for property registration?",
-            "Explain the divorce process under Hindu Marriage Act",
-            "What are my rights as a tenant in India?"
-        ];
-
-        // Add example questions as clickable suggestions
-        const examplesContainer = document.createElement('div');
-        examplesContainer.style.marginTop = '10px';
-        examplesContainer.innerHTML = '<p style="color: #666; font-size: 0.9em; margin-bottom: 5px;">Try asking:</p>';
-        
-        exampleQuestions.forEach(question => {
-            const button = document.createElement('button');
-            button.textContent = question;
-            button.style.cssText = `
-                background: #e3f2fd;
-                border: none;
-                padding: 8px 12px;
-                margin: 5px;
-                border-radius: 5px;
-                font-size: 0.85em;
-                cursor: pointer;
-                transition: background 0.3s;
-            `;
-            button.onmouseover = () => button.style.background = '#bbdefb';
-            button.onmouseout = () => button.style.background = '#e3f2fd';
-            button.onclick = () => {
-                userInput.value = question;
+        // Add click handlers to example questions
+        document.querySelectorAll('.example-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                userInput.value = btn.textContent;
                 userInput.focus();
-            };
-            examplesContainer.appendChild(button);
+            });
         });
 
-        document.querySelector('.chat-input-container').appendChild(examplesContainer);
+        // Add more example questions on click
+        const moreExamples = [
+            "What is bail procedure in India?",
+            "How to draft a legal notice?",
+            "Rights of women under Indian law",
+            "Cyber crime laws in India",
+            "Labor laws for employees"
+        ];
+
+        // Add a button to show more examples
+        const moreExamplesBtn = document.createElement('button');
+        moreExamplesBtn.innerHTML = '<i class="fas fa-plus"></i> More Examples';
+        moreExamplesBtn.style.cssText = `
+            background: transparent;
+            border: 2px dashed #1a237e;
+            color: #1a237e;
+            padding: 8px 15px;
+            border-radius: 20px;
+            margin-top: 10px;
+            cursor: pointer;
+            font-size: 0.85em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        `;
+        
+        moreExamplesBtn.addEventListener('click', () => {
+            moreExamples.forEach(question => {
+                const btn = document.createElement('div');
+                btn.className = 'example-btn';
+                btn.textContent = question;
+                btn.addEventListener('click', () => {
+                    userInput.value = question;
+                    userInput.focus();
+                });
+                exampleQuestions.appendChild(btn);
+            });
+            moreExamplesBtn.style.display = 'none';
+        });
+
+        exampleQuestions.parentNode.insertBefore(moreExamplesBtn, exampleQuestions.nextSibling);
     </script>
 </body>
 </html>
