@@ -3,7 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Indian Law Associates - Legal Assistant</title>
+    <title>GitHub Repository Submission</title>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA4fps5XOnwVzCSiEuDR8MTIDBcj_o-m9w",
+            authDomain: "my-website-729ff.firebaseapp.com",
+            projectId: "my-website-729ff",
+            storageBucket: "my-website-729ff.firebasestorage.app",
+            messagingSenderId: "786071849682",
+            appId: "1:786071849682:web:0e01c42ed38ee18b90fb0b",
+            measurementId: "G-QZFZZVR73K"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.submitRepository = async function() {
+            try {
+                const repoName = document.getElementById('repoName').value;
+                const repoUrl = document.getElementById('repoUrl').value;
+                const developerName = document.getElementById('developerName').value;
+                const email = document.getElementById('email').value;
+                const phone = document.getElementById('phone').value;
+                const description = document.getElementById('description').value;
+                const techStack = document.getElementById('techStack').value;
+
+                if (!repoName || !repoUrl || !developerName) {
+                    alert('Please fill in all required fields');
+                    return;
+                }
+
+                const repoData = {
+                    repoName,
+                    repoUrl,
+                    developerName,
+                    email,
+                    phone,
+                    description,
+                    techStack,
+                    submittedAt: new Date().toISOString(),
+                    status: 'active'
+                };
+
+                const docRef = await addDoc(collection(db, "repositories"), repoData);
+                
+                document.getElementById('successMessage').style.display = 'block';
+                document.getElementById('submissionForm').reset();
+                
+                setTimeout(() => {
+                    document.getElementById('successMessage').style.display = 'none';
+                }, 3000);
+
+                console.log("Document written with ID: ", docRef.id);
+
+            } catch (error) {
+                console.error("Error adding document: ", error);
+                alert('Error submitting repository. Please try again.');
+            }
+        };
+    </script>
     <style>
         * {
             margin: 0;
@@ -13,672 +74,263 @@
         }
 
         body {
-            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             padding: 20px;
         }
 
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 800px;
+            padding: 40px;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
         }
 
-        .logo {
-            font-size: 2.5em;
-            color: #1a237e;
-            font-weight: 700;
+        .header h1 {
+            color: #333;
+            font-size: 2.5rem;
             margin-bottom: 10px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .tagline {
+        .header p {
             color: #666;
-            font-size: 1.1em;
+            font-size: 1.1rem;
         }
 
-        .main-content {
-            display: flex;
-            gap: 30px;
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
             margin-bottom: 30px;
         }
 
-        .chat-container {
-            flex: 3;
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        .form-group {
             display: flex;
             flex-direction: column;
         }
 
-        .chat-header {
-            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
-            color: white;
-            padding: 20px;
-            text-align: center;
+        .form-group.full-width {
+            grid-column: 1 / -1;
         }
 
-        .chat-messages {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            max-height: 500px;
+        label {
+            margin-bottom: 8px;
+            color: #444;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .required::after {
+            content: " *";
+            color: #ff4757;
+        }
+
+        input, textarea, select {
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
             background: #f8f9fa;
         }
 
-        .message {
-            margin-bottom: 20px;
-            padding: 15px;
-            border-radius: 10px;
-            max-width: 80%;
-            animation: fadeIn 0.3s ease;
-            line-height: 1.6;
-        }
-
-        .user-message {
-            background: #e3f2fd;
-            margin-left: auto;
-            border-bottom-right-radius: 5px;
-            border-left: 4px solid #1a237e;
-        }
-
-        .bot-message {
-            background: white;
-            border: 1px solid #e0e0e0;
-            margin-right: auto;
-            border-bottom-left-radius: 5px;
-            border-right: 4px solid #283593;
-        }
-
-        .message-header {
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #1a237e;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .disclaimer {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 15px;
-            font-size: 0.9em;
-            color: #856404;
-        }
-
-        .contact-note {
-            background: #e8f5e9;
-            border: 1px solid #c8e6c9;
-            border-radius: 8px;
-            padding: 12px;
-            margin-top: 15px;
-            font-size: 0.9em;
-            color: #2e7d32;
-            font-weight: 600;
-        }
-
-        .chat-input-container {
-            padding: 20px;
-            background: white;
-            border-top: 1px solid #e0e0e0;
-        }
-
-        .input-group {
-            display: flex;
-            gap: 10px;
-        }
-
-        #user-input {
-            flex: 1;
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 1em;
-            transition: border-color 0.3s;
-        }
-
-        #user-input:focus {
+        input:focus, textarea:focus, select:focus {
             outline: none;
-            border-color: #1a237e;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
-        #send-btn {
-            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .submit-btn {
+            background: linear-gradient(90deg, #667eea, #764ba2);
             color: white;
             border: none;
-            padding: 12px 25px;
-            border-radius: 8px;
-            cursor: pointer;
+            padding: 16px 40px;
+            font-size: 1.1rem;
             font-weight: 600;
-            transition: all 0.3s;
-            display: flex;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 0 auto;
+            width: 200px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .dashboard-link {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .dashboard-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
             align-items: center;
             gap: 8px;
+            transition: all 0.3s ease;
         }
 
-        #send-btn:hover {
-            background: linear-gradient(135deg, #283593 0%, #1a237e 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(26, 35, 126, 0.3);
+        .dashboard-link a:hover {
+            color: #764ba2;
+            gap: 12px;
         }
 
-        #send-btn:disabled {
-            background: #cccccc;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .lawyer-contact {
-            flex: 1;
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        }
-
-        .contact-header {
-            color: #1a237e;
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 1.5em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .lawyer-card {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            padding: 25px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            border-left: 5px solid #1a237e;
-            transition: transform 0.3s;
-        }
-
-        .lawyer-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .lawyer-name {
-            color: #1a237e;
-            font-size: 1.3em;
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-
-        .lawyer-specialization {
-            color: #666;
-            margin-bottom: 15px;
-            font-size: 0.9em;
-            background: #e3f2fd;
-            padding: 5px 10px;
-            border-radius: 4px;
-            display: inline-block;
-        }
-
-        .contact-info {
-            list-style: none;
-        }
-
-        .contact-info li {
-            margin-bottom: 10px;
-            padding-left: 25px;
-            position: relative;
-        }
-
-        .contact-info li i {
-            position: absolute;
-            left: 0;
-            top: 2px;
-            color: #1a237e;
-        }
-
-        .footer {
-            text-align: center;
+        .success-message {
+            background: #4cd964;
             color: white;
-            padding: 20px;
-            font-size: 0.9em;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
-        }
-
-        .typing-indicator {
-            display: none;
             padding: 15px;
-            background: white;
             border-radius: 10px;
-            margin: 10px 0;
-            width: fit-content;
+            text-align: center;
+            margin-bottom: 20px;
+            display: none;
+            animation: slideIn 0.3s ease;
         }
 
-        .typing-dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #1a237e;
-            margin-right: 4px;
-            animation: typing 1.4s infinite;
-        }
-
-        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
-        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
-
-        .examples {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .example-btn {
-            background: #f0f4ff;
-            border: 1px solid #d1d9ff;
-            color: #1a237e;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .example-btn:hover {
-            background: #e3f2fd;
-            border-color: #1a237e;
-            transform: translateY(-2px);
-        }
-
-        @keyframes typing {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-10px); }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @media (max-width: 768px) {
-            .main-content {
-                flex-direction: column;
+            .form-grid {
+                grid-template-columns: 1fr;
             }
             
-            .chat-messages {
-                max-height: 400px;
+            .container {
+                padding: 25px;
             }
             
-            .message {
-                max-width: 90%;
+            .header h1 {
+                font-size: 2rem;
             }
         }
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo"><i class="fas fa-balance-scale"></i> Indian Law Associates</div>
-            <div class="tagline">Your Trusted Legal Partner | Est. 1995</div>
+            <h1>📦 GitHub Repository Submission</h1>
+            <p>Submit your GitHub repository details for our database</p>
         </div>
 
-        <div class="main-content">
-            <div class="chat-container">
-                <div class="chat-header">
-                    <h2><i class="fas fa-robot"></i> AI Legal Assistant</h2>
-                    <p>Ask any legal questions - I'll provide helpful legal information</p>
-                </div>
-                
-                <div class="chat-messages" id="chat-messages">
-                    <div class="message bot-message">
-                        <div class="message-header">
-                            <i class="fas fa-robot"></i> Legal Assistant
-                        </div>
-                        <div>Hello! I'm your AI Legal Assistant from Indian Law Associates. I can help you with information about Indian laws, legal procedures, rights, and various legal matters.</div>
-                        <div class="disclaimer">
-                            <strong><i class="fas fa-exclamation-triangle"></i> Disclaimer:</strong> This AI provides general legal information for educational purposes only. It does not constitute legal advice or create an attorney-client relationship. Always consult with a qualified lawyer for your specific legal situation.
-                        </div>
-                        <div class="examples" id="example-questions">
-                            <div class="example-btn">What is the Indian Penal Code?</div>
-                            <div class="example-btn">How to file a consumer complaint?</div>
-                            <div class="example-btn">Property registration process</div>
-                            <div class="example-btn">Divorce laws in India</div>
-                        </div>
-                    </div>
+        <div id="successMessage" class="success-message">
+            ✅ Repository submitted successfully! Redirecting to dashboard...
+        </div>
+
+        <form id="submissionForm" onsubmit="event.preventDefault(); submitRepository();">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="repoName" class="required">Repository Name</label>
+                    <input type="text" id="repoName" placeholder="Enter repository name" required>
                 </div>
 
-                <div class="typing-indicator" id="typing-indicator">
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
+                <div class="form-group">
+                    <label for="repoUrl" class="required">Repository URL</label>
+                    <input type="url" id="repoUrl" placeholder="https://github.com/username/repo" required>
                 </div>
 
-                <div class="chat-input-container">
-                    <div class="input-group">
-                        <input type="text" id="user-input" placeholder="Type your legal question here..." autocomplete="off">
-                        <button id="send-btn">
-                            <i class="fas fa-paper-plane"></i> Send
-                        </button>
-                    </div>
+                <div class="form-group">
+                    <label for="developerName" class="required">Developer Name</label>
+                    <input type="text" id="developerName" placeholder="Your full name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" placeholder="you@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" placeholder="+1234567890">
+                </div>
+
+                <div class="form-group">
+                    <label for="techStack">Technology Stack</label>
+                    <select id="techStack">
+                        <option value="">Select tech stack</option>
+                        <option value="JavaScript">JavaScript</option>
+                        <option value="Python">Python</option>
+                        <option value="Java">Java</option>
+                        <option value="React">React</option>
+                        <option value="Node.js">Node.js</option>
+                        <option value="Vue.js">Vue.js</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="description">Repository Description</label>
+                    <textarea id="description" placeholder="Describe your project, features, and purpose..."></textarea>
                 </div>
             </div>
 
-            <div class="lawyer-contact">
-                <div class="contact-header">
-                    <i class="fas fa-user-tie"></i> Contact Our Trusted Lawyers
-                </div>
-                
-                <div class="lawyer-card">
-                    <div class="lawyer-name"><i class="fas fa-crown"></i> Adv. Rajesh Kumar</div>
-                    <div class="lawyer-specialization">Supreme Court Advocate | Criminal Law Specialist</div>
-                    <ul class="contact-info">
-                        <li><i class="fas fa-phone"></i> +91 98765 43210</li>
-                        <li><i class="fas fa-envelope"></i> rajesh.kumar@indianlawassociates.in</li>
-                        <li><i class="fas fa-clock"></i> Mon-Fri: 9 AM - 6 PM</li>
-                        <li><i class="fas fa-map-marker-alt"></i> Chamber No. 15, Supreme Court</li>
-                    </ul>
-                </div>
+            <button type="submit" class="submit-btn">
+                Submit Repository
+            </button>
+        </form>
 
-                <div class="lawyer-card">
-                    <div class="lawyer-name"><i class="fas fa-female"></i> Adv. Priya Sharma</div>
-                    <div class="lawyer-specialization">High Court Advocate | Civil & Family Law</div>
-                    <ul class="contact-info">
-                        <li><i class="fas fa-phone"></i> +91 98765 43211</li>
-                        <li><i class="fas fa-envelope"></i> priya.sharma@indianlawassociates.in</li>
-                        <li><i class="fas fa-clock"></i> Mon-Sat: 10 AM - 7 PM</li>
-                        <li><i class="fas fa-map-marker-alt"></i> Delhi High Court Premises</li>
-                    </ul>
-                </div>
-
-                <div class="lawyer-card">
-                    <div class="lawyer-name"><i class="fas fa-briefcase"></i> Adv. Amit Patel</div>
-                    <div class="lawyer-specialization">Corporate & Intellectual Property Law</div>
-                    <ul class="contact-info">
-                        <li><i class="fas fa-phone"></i> +91 98765 43212</li>
-                        <li><i class="fas fa-envelope"></i> amit.patel@indianlawassociates.in</li>
-                        <li><i class="fas fa-clock"></i> By Appointment</li>
-                        <li><i class="fas fa-map-marker-alt"></i> Connaught Place, New Delhi</li>
-                    </ul>
-                </div>
-
-                <div class="contact-note">
-                    <i class="fas fa-handshake"></i> First 30-minute consultation free for new clients
-                </div>
-            </div>
-        </div>
-
-        <div class="footer">
-            <p><i class="fas fa-shield-alt"></i> © 2024 Indian Law Associates. All rights reserved.</p>
-            <p><i class="fas fa-phone-volume"></i> 24/7 Emergency Helpline: 1800-112-2333</p>
+        <div class="dashboard-link">
+            <a href="dashboard.html">
+                <span>View All Submissions</span>
+                <span>→</span>
+            </a>
         </div>
     </div>
 
     <script>
-        const DEEPSEEK_API_KEY = 'sk-e542a3bb6787476b9704ee0a84b21d48';
-        const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
-
-        const chatMessages = document.getElementById('chat-messages');
-        const userInput = document.getElementById('user-input');
-        const sendBtn = document.getElementById('send-btn');
-        const typingIndicator = document.getElementById('typing-indicator');
-        const exampleQuestions = document.getElementById('example-questions');
-
-        // Strict legal system prompt
-        const SYSTEM_PROMPT = `You are a legal assistant for Indian Law Associates. Your ONLY purpose is to provide information about Indian laws, legal procedures, and legal concepts.
-
-STRICT RULES:
-1. ONLY answer questions related to Indian law, legal procedures, rights, court processes, or legal documentation
-2. If asked about non-legal topics, politely respond: "I specialize only in Indian legal matters. Please ask about laws, legal procedures, or legal rights."
-3. Always provide accurate, clear legal information based on Indian legal system
-4. Include disclaimers that this is not legal advice
-5. END EVERY RESPONSE with: "For personalized legal advice and consultation, please contact our trusted lawyers at Indian Law Associates."
-
-TOPICS YOU CAN DISCUSS:
-- Indian Penal Code (IPC), CrPC, CPC
-- Constitutional rights and laws
-- Property laws, Family laws, Business laws
-- Consumer protection, Labor laws, Tax laws
-- Legal procedures, Court processes, Documentation
-- Rights of citizens, Legal remedies
-
-FORMAT:
-- Provide structured information with clear points
-- Mention relevant laws and sections when possible
-- Keep responses professional and helpful
-- Always include disclaimer and contact recommendation`;
-
-        // Fallback legal responses
-        const FALLBACK_RESPONSES = {
-            legal: `I can provide you with general legal information. However, remember that this is not legal advice. For specific legal matters, you should consult with a qualified lawyer.
-
-For personalized legal advice and consultation, please contact our trusted lawyers at Indian Law Associates.`,
-            
-            nonLegal: `I specialize only in Indian legal matters. I can help you with questions about:
-• Laws and legal procedures
-• Rights and legal protections
-• Court processes and documentation
-• Legal requirements and compliance
-
-Please ask about any of these legal topics.
-
-For personalized legal advice and consultation, please contact our trusted lawyers at Indian Law Associates.`
-        };
-
-        // Check if question is legal related
-        function isLegalQuestion(question) {
-            const legalKeywords = [
-                // Laws and Codes
-                'law', 'legal', 'act', 'section', 'code', 'ipc', 'cpc', 'crpc', 'constitution',
-                'statute', 'regulation', 'ordinance', 'bill', 'amendment',
-                
-                // Legal Fields
-                'criminal', 'civil', 'property', 'family', 'divorce', 'marriage', 'inheritance',
-                'contract', 'business', 'corporate', 'tax', 'labor', 'employment', 'consumer',
-                'cyber', 'intellectual', 'patent', 'copyright', 'trademark',
-                
-                // Legal Processes
-                'court', 'judge', 'lawyer', 'advocate', 'case', 'trial', 'hearing', 'judgment',
-                'appeal', 'bail', 'arrest', 'police', 'fir', 'complaint', 'notice', 'suit',
-                'petition', 'affidavit', 'evidence', 'witness', 'testimony',
-                
-                // Rights and Remedies
-                'rights', 'duties', 'obligations', 'liability', 'responsibility',
-                'remedy', 'compensation', 'damages', 'injunction', 'specific performance',
-                
-                // Legal Documentation
-                'agreement', 'contract', 'deed', 'will', 'power of attorney', 'affidavit',
-                'notice', 'summons', 'warrant', 'order', 'decree',
-                
-                // Common Legal Terms
-                'tenant', 'landlord', 'owner', 'possession', 'ownership', 'lease', 'rent',
-                'employee', 'employer', 'salary', 'termination', 'discrimination',
-                'consumer', 'manufacturer', 'seller', 'defect', 'deficiency',
-                'accident', 'injury', 'negligence', 'tort', 'defamation'
-            ];
-            
-            question = question.toLowerCase();
-            return legalKeywords.some(keyword => question.includes(keyword));
-        }
-
-        function addMessage(sender, message) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${sender}-message`;
-            
-            const header = document.createElement('div');
-            header.className = 'message-header';
-            header.innerHTML = sender === 'user' 
-                ? '<i class="fas fa-user"></i> You' 
-                : '<i class="fas fa-robot"></i> Legal Assistant';
-            
-            const content = document.createElement('div');
-            content.innerHTML = message;
-
-            messageDiv.appendChild(header);
-            messageDiv.appendChild(content);
-            
-            chatMessages.appendChild(messageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        function showTypingIndicator() {
-            typingIndicator.style.display = 'block';
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        function hideTypingIndicator() {
-            typingIndicator.style.display = 'none';
-        }
-
-        async function sendMessageToDeepSeek(userMessage) {
-            showTypingIndicator();
-            sendBtn.disabled = true;
-            
-            try {
-                const response = await fetch(DEEPSEEK_API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
-                    },
-                    body: JSON.stringify({
-                        model: "deepseek-chat",
-                        messages: [
-                            {
-                                role: "system",
-                                content: SYSTEM_PROMPT
-                            },
-                            {
-                                role: "user",
-                                content: userMessage
-                            }
-                        ],
-                        temperature: 0.7,
-                        max_tokens: 1000,
-                        stream: false
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`DeepSeek API error: ${response.status}`);
-                }
-
-                const data = await response.json();
-                
-                if (data.choices && data.choices[0] && data.choices[0].message) {
-                    let botResponse = data.choices[0].message.content;
-                    
-                    // Ensure contact information is included
-                    if (!botResponse.includes("contact our trusted lawyers")) {
-                        botResponse += `<br><br><div class="contact-note"><i class="fas fa-handshake"></i> For personalized legal advice and consultation, please contact our trusted lawyers at Indian Law Associates.</div>`;
+        // Auto-redirect to dashboard after successful submission
+        document.addEventListener('DOMContentLoaded', function() {
+            const successMessage = document.getElementById('successMessage');
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                        if (successMessage.style.display === 'block') {
+                            setTimeout(function() {
+                                window.location.href = 'dashboard.html';
+                            }, 1500);
+                        }
                     }
-                    
-                    return botResponse;
-                } else {
-                    throw new Error('Invalid response format from DeepSeek');
-                }
-            } catch (error) {
-                console.error('DeepSeek API Error:', error);
-                
-                // Check if it's a legal question for fallback
-                if (isLegalQuestion(userMessage)) {
-                    return `${FALLBACK_RESPONSES.legal}<br><br><div class="contact-note"><i class="fas fa-exclamation-circle"></i> For detailed legal consultation, please contact our trusted lawyers directly.</div>`;
-                } else {
-                    return `${FALLBACK_RESPONSES.nonLegal}<br><br><div class="contact-note"><i class="fas fa-exclamation-circle"></i> Our trusted lawyers can provide proper legal consultation for your needs.</div>`;
-                }
-            } finally {
-                hideTypingIndicator();
-                sendBtn.disabled = false;
-            }
-        }
-
-        async function sendMessage() {
-            const userMessage = userInput.value.trim();
-            if (!userMessage) return;
-
-            // Add user message to chat
-            addMessage('user', userMessage);
-            userInput.value = '';
-            
-            // Check if it's a legal question first
-            if (!isLegalQuestion(userMessage)) {
-                const response = `${FALLBACK_RESPONSES.nonLegal}<br><br><div class="contact-note"><i class="fas fa-handshake"></i> Our trusted lawyers are available for proper legal consultation.</div>`;
-                addMessage('bot', response);
-                return;
-            }
-            
-            // Get response from DeepSeek
-            const response = await sendMessageToDeepSeek(userMessage);
-            addMessage('bot', response);
-        }
-
-        // Event listeners
-        sendBtn.addEventListener('click', sendMessage);
-        
-        userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !sendBtn.disabled) {
-                sendMessage();
-            }
-        });
-
-        // Add click handlers to example questions
-        document.querySelectorAll('.example-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                userInput.value = btn.textContent;
-                userInput.focus();
-            });
-        });
-
-        // Add more example questions
-        const moreExamples = [
-            "What is bail procedure in India?",
-            "How to draft a legal notice?",
-            "Rights of women under Indian law",
-            "Cyber crime laws in India",
-            "Labor laws for employees",
-            "How to file a police complaint?",
-            "Property transfer process",
-            "Tenant rights in India"
-        ];
-
-        // Add a button to show more examples
-        const moreExamplesBtn = document.createElement('button');
-        moreExamplesBtn.innerHTML = '<i class="fas fa-plus"></i> More Legal Questions';
-        moreExamplesBtn.className = 'example-btn';
-        moreExamplesBtn.style.marginTop = '10px';
-        moreExamplesBtn.style.width = '100%';
-        moreExamplesBtn.style.justifyContent = 'center';
-        
-        moreExamplesBtn.addEventListener('click', () => {
-            moreExamples.forEach(question => {
-                const btn = document.createElement('div');
-                btn.className = 'example-btn';
-                btn.textContent = question;
-                btn.addEventListener('click', () => {
-                    userInput.value = question;
-                    userInput.focus();
                 });
-                exampleQuestions.appendChild(btn);
             });
-            moreExamplesBtn.style.display = 'none';
+            
+            observer.observe(successMessage, { attributes: true });
         });
-
-        exampleQuestions.appendChild(moreExamplesBtn);
-
-        // Auto-focus on input
-        userInput.focus();
     </script>
 </body>
 </html>
