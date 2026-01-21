@@ -9,13 +9,13 @@
         import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
-            apiKey: "AIzaSyA4fps5XOnwVzCSiEuDR8MTIDBcj_o-m9w",
-            authDomain: "my-website-729ff.firebaseapp.com",
-            projectId: "my-website-729ff",
-            storageBucket: "my-website-729ff.firebasestorage.app",
-            messagingSenderId: "786071849682",
-            appId: "1:786071849682:web:0e01c42ed38ee18b90fb0b",
-            measurementId: "G-QZFZZVR73K"
+            apiKey: "AIzaSyAVeEjtLg68DEK-dNtAHN5JFOy1NaevVjA",
+            authDomain: "my-project-1-7e614.firebaseapp.com",
+            projectId: "my-project-1-7e614",
+            storageBucket: "my-project-1-7e614.firebasestorage.app",
+            messagingSenderId: "807664093949",
+            appId: "1:807664093949:web:98b8505fa2277371938c94",
+            measurementId: "G-8DFGXF1QWX"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -48,14 +48,18 @@
                     status: 'active'
                 };
 
+                // Save to Firebase
                 const docRef = await addDoc(collection(db, "repositories"), repoData);
+                
+                // Send email using FormSubmit
+                await sendEmailNotification(repoData);
                 
                 document.getElementById('successMessage').style.display = 'block';
                 document.getElementById('submissionForm').reset();
                 
                 setTimeout(() => {
                     document.getElementById('successMessage').style.display = 'none';
-                }, 3000);
+                }, 5000);
 
                 console.log("Document written with ID: ", docRef.id);
 
@@ -64,6 +68,35 @@
                 alert('Error submitting repository. Please try again.');
             }
         };
+
+        async function sendEmailNotification(repoData) {
+            try {
+                const formData = new FormData();
+                formData.append('repoName', repoData.repoName);
+                formData.append('repoUrl', repoData.repoUrl);
+                formData.append('developerName', repoData.developerName);
+                formData.append('email', repoData.email);
+                formData.append('phone', repoData.phone);
+                formData.append('description', repoData.description);
+                formData.append('techStack', repoData.techStack);
+                formData.append('submittedAt', new Date().toLocaleString());
+                formData.append('_subject', 'New GitHub Repository Submission');
+                formData.append('_template', 'table');
+                formData.append('_captcha', 'false');
+                
+                // Using FormSubmit.co service
+                await fetch('https://formsubmit.co/ajax/lokhandeyuvraj19@gmail.com', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                console.log("Email notification sent successfully");
+                
+            } catch (error) {
+                console.error("Error sending email:", error);
+                // Don't show error to user, just log it
+            }
+        }
     </script>
     <style>
         * {
@@ -183,14 +216,14 @@
             transform: translateY(-1px);
         }
 
-        .dashboard-link {
+        .admin-link {
             text-align: center;
             margin-top: 30px;
             padding-top: 20px;
             border-top: 1px solid #eee;
         }
 
-        .dashboard-link a {
+        .admin-link a {
             color: #667eea;
             text-decoration: none;
             font-weight: 600;
@@ -200,7 +233,7 @@
             transition: all 0.3s ease;
         }
 
-        .dashboard-link a:hover {
+        .admin-link a:hover {
             color: #764ba2;
             gap: 12px;
         }
@@ -214,6 +247,15 @@
             margin-bottom: 20px;
             display: none;
             animation: slideIn 0.3s ease;
+        }
+
+        .success-message p {
+            margin-bottom: 10px;
+        }
+
+        .success-message small {
+            opacity: 0.8;
+            font-size: 0.9rem;
         }
 
         @keyframes slideIn {
@@ -250,7 +292,8 @@
         </div>
 
         <div id="successMessage" class="success-message">
-            ✅ Repository submitted successfully! Redirecting to dashboard...
+            <p>✅ Repository submitted successfully!</p>
+            <small>Data saved to database and email notification sent.</small>
         </div>
 
         <form id="submissionForm" onsubmit="event.preventDefault(); submitRepository();">
@@ -305,32 +348,11 @@
             </button>
         </form>
 
-        <div class="dashboard-link">
-            <a href="dashboard.html">
-                <span>View All Submissions</span>
-                <span>→</span>
+        <div class="admin-link">
+            <a href="admin-login.html">
+                <span>🔐 Admin Access</span>
             </a>
         </div>
     </div>
-
-    <script>
-        // Auto-redirect to dashboard after successful submission
-        document.addEventListener('DOMContentLoaded', function() {
-            const successMessage = document.getElementById('successMessage');
-            const observer = new MutationObserver(function(mutations) {
-                mutations.forEach(function(mutation) {
-                    if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
-                        if (successMessage.style.display === 'block') {
-                            setTimeout(function() {
-                                window.location.href = 'dashboard.html';
-                            }, 1500);
-                        }
-                    }
-                });
-            });
-            
-            observer.observe(successMessage, { attributes: true });
-        });
-    </script>
 </body>
 </html>
